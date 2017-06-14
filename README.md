@@ -1,4 +1,6 @@
-# A simple artificial neural network library in C
+# An artificial neural network library targeting WebAssembly
 
-Based on the [Step by Step Guide to Implementing a Neural Network in C](http://www.cs.bham.ac.uk/~jxb/INC/nn.html)
-by [John A. Bullinaria](http://www.cs.bham.ac.uk/~jxb/). My copy of that code with modification is [here](https://github.com/winksaville/bullinaria-nn). The back propagation code is based on code from [Karsten Kutza](https://www.linkedin.com/in/karstenkutza) with my copy of that code [here](https://github.com/winksaville/kutza-nn).
+This is based on [this commit in test-nn-c](https://github.com/winksaville/test-nn-c/commit/5ca27097024ce857041b5a9773a86a91617724a0)
+which is from branch Make-compatible-with-test-nn-ts. The code is originally
+based on the [Step by Step Guide to Implementing a Neural Network in C](http://www.cs.bham.ac.uk/~jxb/INC/nn.html)
+by [John A. Bullinaria](http://www.cs.bham.ac.uk/~jxb/).
