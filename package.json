@@ -10,13 +10,14 @@
         "node": "^8.0.0"
     },
     "scripts": {
+        "postinstall": "yarn postcleanup",
         "postcleanup": "mkdir -p build out .d",
         "cleanup": "rm -rf out/ build/ .d/",
         "distcleanup": "rm -rf node_modules/ && yarn cleanup",
-        "build:tsc": "tsc -p lib/utils.tsconfig.json && tsc -p src/print_i32.tsconfig.json && tsc -p lib/rand0_1.tsconfig.json",
-        "postinstall": "yarn postcleanup",
-        "pretest": "make build.wasm && yarn build:tsc",
-        "test": "node build/print_i32.js && node build/rand0_1.js"
+        "build:tsc": "tsc -p lib/utils.tsconfig.json && tsc -p lib/tsconfig.json && tsc -p src/print_i32.tsconfig.json",
+        "build:wasm": "make build.wasm",
+        "pretest": "yarn build:wasm && yarn build:tsc",
+        "test": "node build/print_i32.js && node build/rand0_1.js && node build/e_exp.js"
     },
     "devDependencies": {
         "typescript": "^2.3.4"

@@ -97,7 +97,7 @@ huge	= 1.0e+300,
 twom1000= 9.33263618503218878990e-302;     /* 2**-1000=0x01700000,0*/
 
 f64
-__ieee754_exp(f64 x)	/* default IEEE f64 exp */
+e_exp(f64 x)	/* default IEEE f64 exp */
 {
 	f64 y,hi=0.0,lo=0.0,c,t,twopk;
 	i32 k=0,xsb;

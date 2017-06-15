@@ -5,6 +5,7 @@
       "outDir": "../build"
   },
   "files": [
-      "rand0_1.ts"
+      "rand0_1.ts",
+      "e_exp.ts"
   ]
 }
