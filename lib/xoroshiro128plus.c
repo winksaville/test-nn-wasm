@@ -32,25 +32,25 @@ See <http://creativecommons.org/publicdomain/zero/1.0/>. */
    a 64-bit seed, we suggest to seed a splitmix64 generator and use its
    output to fill s. */
 
-#include <stdint.h>
+#include <sizedtypes.h>
 
 #define GLOBAL_INITIALIZER   { 0x853c49e6748fea9bULL, 0xda3e39cb94b95bdbULL }
 
-static uint64_t s[2] = GLOBAL_INITIALIZER;
+static u64 s[2] = GLOBAL_INITIALIZER;
 
-static inline uint64_t rotl(const uint64_t x, int k) {
+static inline u64 rotl(const u64 x, int k) {
 	return (x << k) | (x >> (64 - k));
 }
 
-void xoroshiro128plus_srand(uint64_t v1, uint64_t v2) {
+void xoroshiro128plus_srand(u64 v1, u64 v2) {
     s[0] = v1;
     s[1] = v2;
 }
 
-uint64_t xoroshiro128plus_rand(void) {
-	const uint64_t s0 = s[0];
-	uint64_t s1 = s[1];
-	const uint64_t result = s0 + s1;
+u64 xoroshiro128plus_rand(void) {
+	const u64 s0 = s[0];
+	u64 s1 = s[1];
+	const u64 result = s0 + s1;
 
 	s1 ^= s0;
 	s[0] = rotl(s0, 55) ^ s1 ^ (s1 << 14); // a, b

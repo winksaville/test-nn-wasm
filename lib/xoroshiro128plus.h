@@ -9,8 +9,7 @@ See <http://creativecommons.org/publicdomain/zero/1.0/>. */
 #ifndef XOROSHIRO128PLUS_H_INCLUDED
 #define XOROSHIRO128PLUS_H_INCLUDED
 
-#include <limits.h>
-#include <stdint.h>
+#include "sizedtypes.h"
 
 /* This is the successor to xorshift128+. It is the fastest full-period
    generator passing BigCrush without systematic failures, but due to the
@@ -31,9 +30,9 @@ See <http://creativecommons.org/publicdomain/zero/1.0/>. */
    a 64-bit seed, we suggest to seed a splitmix64 generator and use its
    output to fill s. */
 
-#define xoroshiro128plus_rand_max ULONG_MAX
+#define xoroshiro128plus_rand_max 0xFFFFFFFFFFFFFFFFULL
 
-void xoroshiro128plus_srand(uint64_t v1, uint64_t v2);
-uint64_t xoroshiro128plus_rand(void);
+void xoroshiro128plus_srand(u64 v1, u64 v2);
+u64 xoroshiro128plus_rand(void);
 
 #endif

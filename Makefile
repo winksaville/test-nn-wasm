@@ -22,9 +22,9 @@ srcDir=src
 libDir=lib
 incDir=inc
 libDstDir=$(outDir)/$(libDir)
-dstDir=$(outDir)/$(srcDir)
+srcDstDir=$(outDir)/$(srcDir)
 
-# Make the depDir and dstDirs
+# Make the depDir and srcDstDirs
 $(shell mkdir -p $(depDir) >/dev/null)
 $(shell mkdir -p $(libDstDir) >/dev/null)
 
@@ -60,33 +60,49 @@ $(outDir)/%.o: $(srcDir)/%.c
 $(depDir)/%.d: ;
 .PRECIOUS: $(depDir)/%.d
 
-# wasm suffix rules
-$(dstDir)/%.c.bc: $(srcDir)/%.c
+# wasm suffix rules for srcDir
+$(srcDstDir)/%.c.bc: $(srcDir)/%.c
 	@mkdir -p $(@D)
-	$(cc.wasm) -emit-llvm --target=wasm32 -Weverything -Werror -std=c11 -O3 $< -c -o $@
+	$(cc.wasm) -emit-llvm --target=wasm32 $(CFLAGS) $< -c -o $@
 
-$(dstDir)/%.c.s: $(dstDir)/%.c.bc
+$(srcDstDir)/%.c.s: $(srcDstDir)/%.c.bc
 	$(llc.wasm) -asm-verbose=false $< -o $@
 
-.PRECIOUS: $(dstDir)/%.c.wast
-$(dstDir)/%.c.wast: $(dstDir)/%.c.s
-	$(s2wasm) --import-memory $< -o $@
+#S2WASMFLAGS=--import-memory
+S2WASMFLAGS=
+.PRECIOUS: $(srcDstDir)/%.c.wast
+$(srcDstDir)/%.c.wast: $(srcDstDir)/%.c.s
+	$(s2wasm) $(S2WASMFLAGS) $< -o $@
 
-$(dstDir)/%.c.wasm: $(dstDir)/%.c.wast
+$(srcDstDir)/%.c.wasm: $(srcDstDir)/%.c.wast
+	$(wast2wasm) $< -o $@
+
+# wasm suffix rules for libDir
+$(libDstDir)/%.c.bc: $(libDir)/%.c
+	@mkdir -p $(@D)
+	$(cc.wasm) -emit-llvm --target=wasm32 $(CFLAGS) $< -c -o $@
+
+$(libDstDir)/%.c.s: $(libDstDir)/%.c.bc
+	$(llc.wasm) -asm-verbose=false $< -o $@
+
+.PRECIOUS: $(libDstDir)/%.c.wast
+$(libDstDir)/%.c.wast: $(libDstDir)/%.c.s
+	#$(s2wasm) --import-memory $< -o $@
+	$(s2wasm) $< -o $@
+
+$(libDstDir)/%.c.wasm: $(libDstDir)/%.c.wast
 	$(wast2wasm) $< -o $@
 	
 LIBSRCS= \
 	  $(libDir)/NeuralNet.c \
 	  $(libDir)/NeuralNetIo.c \
 	  $(libDir)/xoroshiro128plus.c \
-	  $(libDir)/pcg_basic.c \
 	  $(libDir)/rand0_1.c
 
 LIBOBJS= \
 	  $(libDstDir)/NeuralNet.o \
 	  $(libDstDir)/NeuralNetIo.o \
 	  $(libDstDir)/xoroshiro128plus.o \
-	  $(libDstDir)/pcg_basic.o \
 	  $(libDstDir)/rand0_1.o
 
 all: $(outDir)/test-nn build.wasm
@@ -100,7 +116,9 @@ $(outDir)/test-nn : $(LIBOBJS) $(outDir)/test-nn.o
 test: $(outDir)/test-nn
 	$(outDir)/test-nn $(P1)
 
-build.wasm: $(dstDir)/call_print_i32.c.wasm
+build.wasm: $(srcDstDir)/call_print_i32.c.wasm $(libDstDir)/rand0_1.c.wasm #$(libDstDir)/xoroshiro128plus.c.wasm
+	#wasm-link isn't working if there are globals, so I added xorshiro128plus.c directly to rand0_1.c
+	#$(wasm-link) $(libDstDir)/rand0_1.c.wasm $(libDstDir)/xoroshiro128plus.c.wasm -o $(libDstDir)/librand0_1.wasm
 
 clean :
 	@rm -rf $(outDir) $(depDir)
