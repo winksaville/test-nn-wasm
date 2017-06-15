@@ -14,7 +14,7 @@
         "cleanup": "rm -rf out/ build/ .d/",
         "distcleanup": "rm -rf node_modules/ && yarn cleanup",
         "build:wasm": "../llvmwasm-builder/dist/bin/wast2wasm src/call_print_i32.wast --output build/call_print_i32.wasm",
-        "build:tsc": "tsc -p src/utils.tsconfig.json && tsc -p src/print_i32.tsconfig.json",
+        "build:tsc": "tsc -p lib/utils.tsconfig.json && tsc -p src/print_i32.tsconfig.json",
         "postinstall": "yarn postcleanup",
         "pretest": "make build.wasm && yarn build:tsc",
         "test": "node --expose_wasm build/print_i32.js"
