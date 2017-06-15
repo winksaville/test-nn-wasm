@@ -10,9 +10,6 @@
  * ====================================================
  */
 
-#include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
-
 /* __ieee754_exp(x)
  * Returns the exponential of x.
  *
@@ -76,12 +73,10 @@ __FBSDID("$FreeBSD$");
  * to produce the hexadecimal values shown.
  */
 
-#include <float.h>
+#include "e_exp.h"
+#include "private.h"
 
-#include "math.h"
-#include "math_private.h"
-
-static const double
+static const f64
 one	= 1.0,
 halF[2]	= {0.5,-0.5,},
 o_threshold=  7.09782712893383973096e+02,  /* 0x40862E42, 0xFEFA39EF */
@@ -97,16 +92,16 @@ P3   =  6.61375632143793436117e-05, /* 0x3F11566A, 0xAF25DE2C */
 P4   = -1.65339022054652515390e-06, /* 0xBEBBBD41, 0xC5D26BF1 */
 P5   =  4.13813679705723846039e-08; /* 0x3E663769, 0x72BEA4D0 */
 
-static volatile double
+static volatile f64
 huge	= 1.0e+300,
 twom1000= 9.33263618503218878990e-302;     /* 2**-1000=0x01700000,0*/
 
-double
-__ieee754_exp(double x)	/* default IEEE double exp */
+f64
+__ieee754_exp(f64 x)	/* default IEEE f64 exp */
 {
-	double y,hi=0.0,lo=0.0,c,t,twopk;
-	int32_t k=0,xsb;
-	u_int32_t hx;
+	f64 y,hi=0.0,lo=0.0,c,t,twopk;
+	i32 k=0,xsb;
+	u32 hx;
 
 	GET_HIGH_WORD(hx,x);
 	xsb = (hx>>31)&1;		/* sign bit of x */
@@ -115,7 +110,7 @@ __ieee754_exp(double x)	/* default IEEE double exp */
     /* filter out non-finite argument */
 	if(hx >= 0x40862E42) {			/* if |x|>=709.78... */
             if(hx>=0x7ff00000) {
-	        u_int32_t lx;
+	        u32 lx;
 		GET_LOW_WORD(lx,x);
 		if(((hx&0xfffff)|lx)!=0)
 		     return x+x; 		/* NaN */
@@ -135,7 +130,7 @@ __ieee754_exp(double x)	/* default IEEE double exp */
 		hi = x - t*ln2HI[0];	/* t*ln2HI is exact here */
 		lo = t*ln2LO[0];
 	    }
-	    STRICT_ASSIGN(double, x, hi - lo);
+	    STRICT_ASSIGN(f64, x, hi - lo);
 	} 
 	else if(hx < 0x3e300000)  {	/* when |x|<2**-28 */
 	    if(huge+x>one) return one+x;/* trigger inexact */
@@ -146,7 +141,7 @@ __ieee754_exp(double x)	/* default IEEE double exp */
 	t  = x*x;
 	if(k >= -1021)
 	    INSERT_WORDS(twopk,0x3ff00000+(k<<20), 0);
-	else
+    else
 	    INSERT_WORDS(twopk,0x3ff00000+((k+1000)<<20), 0);
 	c  = x - t*(P1+t*(P2+t*(P3+t*(P4+t*P5))));
 	if(k==0) 	return one-((x*c)/(c-2.0)-x); 
@@ -158,7 +153,3 @@ __ieee754_exp(double x)	/* default IEEE double exp */
 	    return y*twopk*twom1000;
 	}
 }
-
-#if (LDBL_MANT_DIG == 53)
-__weak_reference(exp, expl);
-#endif

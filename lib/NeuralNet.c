@@ -17,6 +17,7 @@
 #include "NeuralNet.h"
 #include "dbg.h"
 #include "rand0_1.h"
+#include "e_exp.h"
 #include "unused.h"
 
 #include <malloc.h>
@@ -287,7 +288,7 @@ static void NeuralNet_process(NeuralNet* nn) {
       }
 
       // Calcuate the output using a Sigmoidal Activation function
-      neuron->output = 1.0 / (1.0 + exp(-weighted_sum));
+      neuron->output = 1.0 / (1.0 + e_exp(-weighted_sum));
       dbg("NeuralNet_process_: %p output=%lf weighted_sum=%lf\n",
           (void*)neuron, neuron->output, weighted_sum);
     }

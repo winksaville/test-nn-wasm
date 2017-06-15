@@ -36,7 +36,7 @@ wasm2wast=$(HOME)/prgs/llvmwasm-builder/dist/bin/wasm2wast
 wasm-link=$(HOME)/prgs/llvmwasm-builder/dist/bin/wasm-link
 
 CC=clang
-CFLAGS=-O3 -g -Weverything -Werror -std=c11 -I$(incDir) -DDBG=$(_DBG)
+CFLAGS=-O3 -Weverything -Werror -std=c11 -I$(incDir) -DDBG=$(_DBG)
 DEPFLAGS = -MT $@ -MMD -MP -MF $(depDir)/$*.Td
 
 OD=objdump
@@ -45,7 +45,7 @@ ODFLAGS=-S -M x86_64,intel
 LNK=$(CC)
 LNKFLAGS=-lm
 
-COMPILE.c = $(CC) $(DEPFLAGS) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+COMPILE.c = $(CC) $(DEPFLAGS) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -g -c
 POSTCOMPILE = @mv -f $(depDir)/$*.Td $(depDir)/$*.d && touch $@
 
 # native suffix rules
@@ -97,13 +97,15 @@ LIBSRCS= \
 	  $(libDir)/NeuralNet.c \
 	  $(libDir)/NeuralNetIo.c \
 	  $(libDir)/xoroshiro128plus.c \
-	  $(libDir)/rand0_1.c
+	  $(libDir)/rand0_1.c \
+	  $(libDir)/e_exp.c
 
 LIBOBJS= \
 	  $(libDstDir)/NeuralNet.o \
 	  $(libDstDir)/NeuralNetIo.o \
 	  $(libDstDir)/xoroshiro128plus.o \
-	  $(libDstDir)/rand0_1.o
+	  $(libDstDir)/rand0_1.o \
+	  $(libDstDir)/e_exp.o
 
 all: $(outDir)/test-nn build.wasm
 
@@ -116,7 +118,11 @@ $(outDir)/test-nn : $(LIBOBJS) $(outDir)/test-nn.o
 test: $(outDir)/test-nn
 	$(outDir)/test-nn $(P1)
 
-build.wasm: $(srcDstDir)/call_print_i32.c.wasm $(libDstDir)/rand0_1.c.wasm #$(libDstDir)/xoroshiro128plus.c.wasm
+build.wasm: \
+ $(srcDstDir)/call_print_i32.c.wasm \
+ $(libDstDir)/e_exp.c.wasm \
+ $(libDstDir)/rand0_1.c.wasm \
+ #$(libDstDir)/xoroshiro128plus.c.wasm
 	#wasm-link isn't working if there are globals, so I added xorshiro128plus.c directly to rand0_1.c
 	#$(wasm-link) $(libDstDir)/rand0_1.c.wasm $(libDstDir)/xoroshiro128plus.c.wasm -o $(libDstDir)/librand0_1.wasm
 
