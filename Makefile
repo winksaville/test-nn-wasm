@@ -1,4 +1,6 @@
 # Makefile for test-nn
+# The auto-dependency generation algorithm:
+#    http://make.mad-scientist.net/papers/advanced-auto-dependency-generation/
 # Parameters:
 #   DBG=0 or 1 (default = 0)
 
@@ -11,6 +13,7 @@ ifeq ($(_DBG), +)
   _DBG = 0
 endif
 
+# Default value for P1 parameter
 P1=10000000
 
 depDir=.d
@@ -33,7 +36,7 @@ wasm2wast=$(HOME)/prgs/llvmwasm-builder/dist/bin/wasm2wast
 wasm-link=$(HOME)/prgs/llvmwasm-builder/dist/bin/wasm-link
 
 CC=clang
-CFLAGS=-O3 -g -Weverything -Werror -I$(incDir) -DDBG=$(_DBG)
+CFLAGS=-O3 -g -Weverything -Werror -std=c11 -I$(incDir) -DDBG=$(_DBG)
 DEPFLAGS = -MT $@ -MMD -MP -MF $(depDir)/$*.Td
 
 OD=objdump
@@ -44,9 +47,6 @@ LNKFLAGS=-lm
 
 COMPILE.c = $(CC) $(DEPFLAGS) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
 POSTCOMPILE = @mv -f $(depDir)/$*.Td $(depDir)/$*.d && touch $@
-
-LIBOBJS=$(libDstDir)/NeuralNet.o $(libDstDir)/NeuralNetIo.o \
-		$(libDstDir)/rand0_1.o
 
 # native suffix rules
 $(libDstDir)/%.o: $(libDir)/%.c $(depDir)/%.d
@@ -63,7 +63,7 @@ $(depDir)/%.d: ;
 # wasm suffix rules
 $(dstDir)/%.c.bc: $(srcDir)/%.c
 	@mkdir -p $(@D)
-	$(cc.wasm) -emit-llvm --target=wasm32 -Weverything -Oz $< -c -o $@
+	$(cc.wasm) -emit-llvm --target=wasm32 -Weverything -Werror -std=c11 -O3 $< -c -o $@
 
 $(dstDir)/%.c.s: $(dstDir)/%.c.bc
 	$(llc.wasm) -asm-verbose=false $< -o $@
@@ -78,7 +78,16 @@ $(dstDir)/%.c.wasm: $(dstDir)/%.c.wast
 LIBSRCS= \
 	  $(libDir)/NeuralNet.c \
 	  $(libDir)/NeuralNetIo.c \
+	  $(libDir)/xoroshiro128plus.c \
+	  $(libDir)/pcg_basic.c \
 	  $(libDir)/rand0_1.c
+
+LIBOBJS= \
+	  $(libDstDir)/NeuralNet.o \
+	  $(libDstDir)/NeuralNetIo.o \
+	  $(libDstDir)/xoroshiro128plus.o \
+	  $(libDstDir)/pcg_basic.o \
+	  $(libDstDir)/rand0_1.o
 
 all: $(outDir)/test-nn build.wasm
 

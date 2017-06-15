@@ -14,48 +14,27 @@
  * limitations under the License.
  */
 
-#include "dbg.h"
+#include "limits.h"
+#include "./xoroshiro128plus.h"
+#include "./pcg_basic.h"
 #include "rand0_1.h"
-#include <stdio.h>
-#include <stdlib.h>
-
-#define debugging 0
-
-#if debugging
-static int rand_idx = 0;
-static double rand_nums[] = {
-    0.840188,
-    0.394383,
-    0.783099,
-    0.798440,
-    0.911647,
-    0.197551,
-    0.335223,
-    0.768230,
-    0.277775,
-    0.553970,
-    0.477397,
-    0.628871,
-    0.364784,
-    0.513401,
-    0.952230,
-    0.916195,
-    0.635712
-};
-#endif
 
 double rand0_1(void) {
     double v;
-#if !debugging
-    double r = rand();
-    v = r/((double)RAND_MAX+1);
+#if 1
+    #define RAND_MAX xoroshiro128plus_rand_max
+    uint64_t r = xoroshiro128plus_rand();
 #else
-    v = rand_nums[rand_idx++];
-    if (rand_idx >= sizeof(rand_nums)/sizeof(rand_nums[0])) {
-        dbg("rand0_1=overlowed\n");
-        rand_idx = 0;
-    }
+    #define RAND_MAX pcg32_rand_max
+    uint64_t r = pcg32_random();
 #endif
-    dbg("rand0_1=%lf\n", v);
+
+#if (RAND_MAX > (1ULL << 53))
+    // As suggested by Sebastiano "Generating uniform doubles in the unit interval"
+    // at http://xoroshiro.di.unimi.it
+    v = (r >> 11) * (1.0 / ((uint64_t)1 << 53));
+#else
+    v = r * (1.0 / (RAND_MAX + 1.0));
+#endif
     return v;
 }
