@@ -87,8 +87,7 @@ $(libDstDir)/%.c.s: $(libDstDir)/%.c.bc
 
 .PRECIOUS: $(libDstDir)/%.c.wast
 $(libDstDir)/%.c.wast: $(libDstDir)/%.c.s
-	#$(s2wasm) --import-memory $< -o $@
-	$(s2wasm) $< -o $@
+	$(s2wasm) $(S2WASMFLAGS) $< -o $@
 
 $(libDstDir)/%.c.wasm: $(libDstDir)/%.c.wast
 	$(wast2wasm) $< -o $@
@@ -126,16 +125,20 @@ $(outDir)/test-nn : $(LIBOBJS) $(outDir)/test-nn.o
 test: $(outDir)/test-nn
 	$(outDir)/test-nn $(P1)
 
+#build.wasm: \
+# $(srcDstDir)/call_print_i32.c.wasm \
+# $(libDstDir)/e_exp.c.wasm \
+# $(libDstDir)/malloc.c.wasm \
+# $(libDstDir)/calloc.c.wasm \
+# $(libDstDir)/memset.c.wasm \
+# $(libDstDir)/xoroshiro128plus.c.wasm \
+# $(libDstDir)/rand0_1.c.wasm
+#	$(wasm-link) $^ -o $(libDstDir)/libwasm.c.wasm
+
 build.wasm: \
  $(srcDstDir)/call_print_i32.c.wasm \
- $(libDstDir)/e_exp.c.wasm \
- $(libDstDir)/malloc.c.wasm \
- $(libDstDir)/calloc.c.wasm \
- $(libDstDir)/memset.c.wasm \
- $(libDstDir)/rand0_1.c.wasm
-
-#	wasm-link isn't working we et 'unsupport export type: 2'
-#	$(wasm-link) $(libDstDir)/rand0_1.c.wasm $(libDstDir)/malloc.c.wasm -o $(libDstDir)/libWasm.wasm
+ $(libDstDir)/libwasm.c.wasm \
+ $(libDstDir)/libwasm.c.wast
 
 clean :
 	@rm -rf $(outDir) $(depDir)

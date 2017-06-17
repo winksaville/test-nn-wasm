@@ -15,7 +15,7 @@ let free: (add: number) => void;
 
 async function load_wasm_imports(): Promise<Error | null> {
     try {
-        let instance = await instantiateWasmFile("./out/lib/malloc.c.wasm",
+        let instance = await instantiateWasmFile("./out/lib/libwasm.c.wasm",
             importsForInstance);
         malloc = instance.exports.malloc;
         free = instance.exports.free;

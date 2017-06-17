@@ -30,7 +30,7 @@ let e_exp: (v: number) => number;
 
 async function load_wasm_imports(): Promise<Error | null> {
     try {
-        let instance = await instantiateWasmFile("./out/lib/e_exp.c.wasm",
+        let instance = await instantiateWasmFile("./out/lib/libwasm.c.wasm",
             importsForInstance);
         e_exp = instance.exports.e_exp;
         return Promise.resolve(null);

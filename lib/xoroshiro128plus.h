@@ -30,7 +30,7 @@ See <http://creativecommons.org/publicdomain/zero/1.0/>. */
    a 64-bit seed, we suggest to seed a splitmix64 generator and use its
    output to fill s. */
 
-#define xoroshiro128plus_rand_max 0xFFFFFFFFFFFFFFFFULL
+#define RAND_MAX 0xFFFFFFFFFFFFFFFFULL
 
 void xoroshiro128plus_srand(u64 v1, u64 v2);
 u64 xoroshiro128plus_rand(void);

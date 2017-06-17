@@ -1,0 +1,6 @@
+#include "e_exp.c"
+#include "malloc.c"
+#include "calloc.c"
+#include "memset.c"
+#include "xoroshiro128plus.c"
+#include "rand0_1.c"

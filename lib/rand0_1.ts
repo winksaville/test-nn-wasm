@@ -15,7 +15,7 @@ let srand0_1: (v1: number, v2: number, v3: number, v4: number) => void;
 
 async function load_wasm_imports(): Promise<Error | null> {
     try {
-        let instance = await instantiateWasmFile("./out/lib/rand0_1.c.wasm",
+        let instance = await instantiateWasmFile("./out/lib/libwasm.c.wasm",
             importsForInstance);
         rand0_1 = instance.exports.rand0_1;
         srand0_1 = instance.exports.srand0_1;
