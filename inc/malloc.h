@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-#ifndef E_EXP_H
-#define E_EXP_H
+#ifndef MALLOC_H
+#define MALLOC_H
 
-#include "sizedtypes.h"
+#include "types.h"
 
-#if 1
-f64 e_exp(f64 x);
-#else
-#define e_exp(x) exp(x)
-#endif
+void *malloc(size_t size);
+void free(void* p);
 
 #endif

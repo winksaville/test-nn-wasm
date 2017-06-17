@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-#ifndef E_EXP_H
-#define E_EXP_H
+#include "calloc.h"
+#include "malloc.h"
+#include "memset.h"
+#include "types.h"
 
-#include "sizedtypes.h"
-
-#if 1
-f64 e_exp(f64 x);
-#else
-#define e_exp(x) exp(x)
-#endif
-
-#endif
+/**
+ * Allocate memory and zero.
+ * 
+ * @param nitems is number of items to allocate and clear
+ * @param size is size of each element
+ * @return address and the memory zeroed
+ */
+void *calloc(size_t nitems, size_t size) {
+    u8* p = malloc(nitems * size);
+    if (p != NULL) {
+        memset(p, 0, nitems * size);
+    }
+    return p;
+}

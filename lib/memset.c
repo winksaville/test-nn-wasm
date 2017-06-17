@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-#ifndef E_EXP_H
-#define E_EXP_H
+#include "memset.h"
+#include "types.h"
 
-#include "sizedtypes.h"
-
-#if 1
-f64 e_exp(f64 x);
-#else
-#define e_exp(x) exp(x)
-#endif
-
-#endif
+/**
+ * Fill memory with val
+ *
+ * @param pDst is starting address
+ * @param byte is used to fill memory, byte is cast to a u8
+ * @param size is the number of bytes to write
+ * @return pDst
+ */
+void *memset(void* pDst, int byte, size_t size) {
+    u8* p = (u8*)pDst;
+    u8* e = p + size;
+    while(p < e) {
+        *p++ = (u8)byte;
+    }
+    return pDst;
+}

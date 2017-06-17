@@ -28,7 +28,7 @@ yarn postcleanup v0.24.6
 ```
 $ yarn test
 yarn test v0.24.6
-$ make build.wasm && yarn build:tsc
+$ make build.wasm && yarn build.tsc
 /home/wink/prgs/llvmwasm-builder/dist/bin/clang -emit-llvm --target=wasm32 -Weverything -Oz src/call_print_i32.c -c -o out/src/call_print_i32.c.bc
 /home/wink/prgs/llvmwasm-builder/dist/bin/llc -asm-verbose=false out/src/call_print_i32.c.bc -o out/src/call_print_i32.c.s
 /home/wink/prgs/llvmwasm-builder/dist/bin/s2wasm --import-memory out/src/call_print_i32.c.s -o out/src/call_print_i32.c.wast

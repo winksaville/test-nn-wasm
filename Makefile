@@ -98,16 +98,24 @@ LIBSRCS= \
 	  $(libDir)/NeuralNetIo.c \
 	  $(libDir)/xoroshiro128plus.c \
 	  $(libDir)/rand0_1.c \
-	  $(libDir)/e_exp.c
+	  $(libDir)/e_exp.c \
+	  $(libDir)/calloc.c \
+	  $(libDir)/malloc.c \
+	  $(libDir)/memset.c
 
 LIBOBJS= \
 	  $(libDstDir)/NeuralNet.o \
 	  $(libDstDir)/NeuralNetIo.o \
 	  $(libDstDir)/xoroshiro128plus.o \
 	  $(libDstDir)/rand0_1.o \
-	  $(libDstDir)/e_exp.o
+	  $(libDstDir)/e_exp.o \
+	  $(libDstDir)/calloc.o \
+	  $(libDstDir)/malloc.o \
+	  $(libDstDir)/memset.o
 
-all: $(outDir)/test-nn build.wasm
+all: build.native build.wasm
+
+build.native: $(outDir)/test-nn
 
 include $(wildcard $(patsubst %,$(DEPDIR)/%.d,$(basename $(LIBSRCS))))
 
@@ -121,10 +129,13 @@ test: $(outDir)/test-nn
 build.wasm: \
  $(srcDstDir)/call_print_i32.c.wasm \
  $(libDstDir)/e_exp.c.wasm \
- $(libDstDir)/rand0_1.c.wasm \
- #$(libDstDir)/xoroshiro128plus.c.wasm
-	#wasm-link isn't working if there are globals, so I added xorshiro128plus.c directly to rand0_1.c
-	#$(wasm-link) $(libDstDir)/rand0_1.c.wasm $(libDstDir)/xoroshiro128plus.c.wasm -o $(libDstDir)/librand0_1.wasm
+ $(libDstDir)/malloc.c.wasm \
+ $(libDstDir)/calloc.c.wasm \
+ $(libDstDir)/memset.c.wasm \
+ $(libDstDir)/rand0_1.c.wasm
+
+#	wasm-link isn't working we et 'unsupport export type: 2'
+#	$(wasm-link) $(libDstDir)/rand0_1.c.wasm $(libDstDir)/malloc.c.wasm -o $(libDstDir)/libWasm.wasm
 
 clean :
 	@rm -rf $(outDir) $(depDir)

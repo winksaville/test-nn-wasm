@@ -6,6 +6,7 @@
   },
   "files": [
       "rand0_1.ts",
-      "e_exp.ts"
+      "e_exp.ts",
+      "malloc.ts"
   ]
 }

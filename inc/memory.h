@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-#ifndef E_EXP_H
-#define E_EXP_H
+#ifndef MEMORY_H
+#define MEMORY_H
 
-#include "sizedtypes.h"
-
-#if 1
-f64 e_exp(f64 x);
-#else
-#define e_exp(x) exp(x)
-#endif
+#include "malloc.h"
+#include "calloc.h"
+#include "memset.h"
 
 #endif

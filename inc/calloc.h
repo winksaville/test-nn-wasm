@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-#ifndef E_EXP_H
-#define E_EXP_H
+#ifndef CALLOC_H
+#define CALLOC_H
 
-#include "sizedtypes.h"
+#include "types.h"
 
-#if 1
-f64 e_exp(f64 x);
-#else
-#define e_exp(x) exp(x)
-#endif
+void *calloc(size_t nitems, size_t size);
 
 #endif

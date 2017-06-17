@@ -18,11 +18,10 @@
 #include "dbg.h"
 #include "rand0_1.h"
 #include "e_exp.h"
+#include "calloc.h"
 #include "unused.h"
 
-#include <malloc.h>
 #include <math.h>
-#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 

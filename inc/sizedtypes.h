@@ -21,15 +21,15 @@
 #define U16_MIN 0x0
 #define U8_MIN  0x0
 
-typedef long long i64;
-typedef int i32;
-typedef short i16;
-typedef char i8;
+typedef __INT64_TYPE__ i64;
+typedef __INT32_TYPE__ i32;
+typedef __INT16_TYPE__ i16;
+typedef __INT8_TYPE__  i8;
 
-typedef unsigned long long u64;
-typedef unsigned int u32;
-typedef unsigned short u16;
-typedef unsigned char u8;
+typedef __UINT64_TYPE__ u64;
+typedef __UINT32_TYPE__ u32;
+typedef __UINT16_TYPE__ u16;
+typedef __UINT8_TYPE__  u8;
 
 typedef double f64;
 typedef float f32;

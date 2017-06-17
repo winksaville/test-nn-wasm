@@ -14,15 +14,38 @@
  * limitations under the License.
  */
 
-#ifndef E_EXP_H
-#define E_EXP_H
+#include "malloc.h"
+#include "types.h"
 
-#include "sizedtypes.h"
-
-#if 1
-f64 e_exp(f64 x);
-#else
-#define e_exp(x) exp(x)
+#ifndef MEMORY_SIZE
+#define MEMORY_SIZE 0x8000
 #endif
 
-#endif
+static u8 memory[MEMORY_SIZE];
+static u8* pHeap = memory;
+static u8* pEnd = &memory[MEMORY_SIZE];
+
+/**
+ * Allocate memory
+ *
+ * @param size is number of bytes to allocate
+ * @return address
+ */
+void *malloc(size_t size) {
+    u8* p = (u8*)ROUNDUP(pHeap, 8);
+    u8* e = p + size;
+    if (e >= pEnd) {
+        return NULL;
+    }
+    pHeap = e;
+    return p;
+}
+
+/**
+ * Free memory
+ *
+ * @p is address of memory allocated with malloc
+ */
+void free(void *p) {
+    UNUSED(p);
+}
