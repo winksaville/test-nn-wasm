@@ -125,6 +125,7 @@ $(outDir)/test-nn : $(LIBOBJS) $(outDir)/test-nn.o
 test: $(outDir)/test-nn
 	$(outDir)/test-nn $(P1)
 
+# Currently wasm-link doesn't work with modules that have a memory section
 #build.wasm: \
 # $(srcDstDir)/call_print_i32.c.wasm \
 # $(libDstDir)/e_exp.c.wasm \
@@ -135,10 +136,19 @@ test: $(outDir)/test-nn
 # $(libDstDir)/rand0_1.c.wasm
 #	$(wasm-link) $^ -o $(libDstDir)/libwasm.c.wasm
 
+$(libDir)/libwasm.c: \
+ $(libDir)/e_exp.c \
+ $(libDir)/malloc.c \
+ $(libDir)/calloc.c \
+ $(libDir)/memset.c \
+ $(libDir)/xoroshiro128plus.c \
+ $(libDir)/rand0_1.c
+	touch $(libDir)/libwasm.c
+
 build.wasm: \
- $(srcDstDir)/call_print_i32.c.wasm \
+ $(libDir)/libwasm.c \
  $(libDstDir)/libwasm.c.wasm \
- $(libDstDir)/libwasm.c.wast
+ $(srcDstDir)/call_print_i32.c.wasm
 
 clean :
 	@rm -rf $(outDir) $(depDir)
