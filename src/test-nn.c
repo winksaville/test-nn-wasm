@@ -34,12 +34,14 @@
 
 #define INPUT_COUNT 2
 typedef struct InputPattern {
+  unsigned long padding;
   unsigned long count;
   double data[INPUT_COUNT];
 } InputPattern;
 
 #define OUTPUT_COUNT 1
 typedef struct OutputPattern {
+  unsigned long padding;
   unsigned long count;
   double data[OUTPUT_COUNT];
 } OutputPattern;
