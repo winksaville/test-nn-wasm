@@ -116,7 +116,7 @@ all: build.native build.wasm
 
 build.native: $(outDir)/test-nn
 
-include $(wildcard $(patsubst %,$(DEPDIR)/%.d,$(basename $(LIBSRCS))))
+include $(wildcard $(patsubst %,$(depDir)/%.d,$(basename $(notdir $(LIBSRCS)))))
 
 $(outDir)/test-nn : $(LIBOBJS) $(outDir)/test-nn.o
 	$(LNK) $(LIBOBJS) $(outDir)/test-nn.o $(LNKFLAGS) -o $@
