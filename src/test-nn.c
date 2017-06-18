@@ -32,19 +32,21 @@
 #include <sys/time.h>
 #include <locale.h>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpadded"
 #define INPUT_COUNT 2
 typedef struct InputPattern {
-  unsigned long padding;
-  unsigned long count;
-  double data[INPUT_COUNT];
+  u64 count;
+  f64 data[INPUT_COUNT];
 } InputPattern;
 
 #define OUTPUT_COUNT 1
 typedef struct OutputPattern {
-  unsigned long padding;
-  unsigned long count;
-  double data[OUTPUT_COUNT];
+  u64 count;
+  f64 data[OUTPUT_COUNT];
 } OutputPattern;
+#pragma clang diagnostic pop
+
 
 static InputPattern xor_input_patterns[] = {
   { .count = INPUT_COUNT, .data[0] = 0, .data[1] = 0 },
@@ -66,10 +68,10 @@ static OutputPattern xor_output[sizeof(xor_target_patterns)/sizeof(OutputPattern
 
 int main(int argc, char** argv) {
   Status status;
-  unsigned long epoch = 0;
-  unsigned long epoch_count = 0;
-  double error = 0.0;
-  double error_threshold = 0.0004;
+  u64 epoch = 0;
+  u64 epoch_count = 0;
+  f64 error = 0.0;
+  f64 error_threshold = 0.0004;
 
   NeuralNetIoWriter *writer = NULL;
 
@@ -95,13 +97,13 @@ int main(int argc, char** argv) {
   } else if ((error_threshold > 0.0) && (error_threshold < 1.0)) {
     epoch_count = ULONG_MAX;
   } else {
-    double count = floor(error_threshold);
+    f64 count = floor(error_threshold);
     if (count > ULONG_MAX) {
-      printf("param1:%'lg > %'lg:%'lu, aborting\n", count, (double)ULONG_MAX, ULONG_MAX);
+      printf("param1:%'lg > %'lg:%'lu, aborting\n", count, (f64)ULONG_MAX, ULONG_MAX);
       status = STATUS_ERR;
       goto donedone;
     }
-    epoch_count = (unsigned long)count;
+    epoch_count = (u64)count;
     error_threshold = 0.0;
   }
 
@@ -111,13 +113,13 @@ int main(int argc, char** argv) {
     out_path = argv[2];
   }
 
-  dbg("test-nn: epoch_count=%ld out_pat='%s'\n", epoch_count, out_path);
+  dbg("test-nn: epoch_count=%" PRId64 " out_pat='%s'\n", epoch_count, out_path);
 
   // seed the random number generator
 #if 0
   struct timespec spec;
   clock_gettime(CLOCK_REALTIME, &spec);
-  double dnow_us = (((double)spec.tv_sec * 1.0e9) + spec.tv_nsec) / 1.0e3;
+  f64 dnow_us = (((f64)spec.tv_sec * 1.0e9) + spec.tv_nsec) / 1.0e3;
   int now = (int)(long)dnow_us;
   dbg("dnow_us=%lf now=0x%x\n", dnow_us, now);
   srand(now);
@@ -125,14 +127,14 @@ int main(int argc, char** argv) {
   srand(1);
 #endif
 
-  unsigned long num_inputs = 2;
-  unsigned long num_hidden = 1;
-  unsigned long num_outputs = 1;
+  u64 num_inputs = 2;
+  u64 num_hidden = 1;
+  u64 num_outputs = 1;
   status = NeuralNet_init(&nn, num_inputs, num_hidden, num_outputs);
   if (StatusErr(status)) goto done;
 
   // Each hidden layer is fully connected plus a bias
-  unsigned long hidden_neurons = 2;
+  u64 hidden_neurons = 2;
   status = nn.add_hidden(&nn, hidden_neurons);
   if (StatusErr(status)) goto done;
 
@@ -166,7 +168,7 @@ int main(int argc, char** argv) {
 
     // Shuffle
     for (unsigned int p = 0; p < pattern_count; p++) {
-      double r0_1 = rand0_1();
+      f64 r0_1 = rand0_1();
       unsigned int rp = p + (unsigned int)(r0_1 * (pattern_count - p));
       unsigned t = rand_ps[p];
       rand_ps[p] = rand_ps[rp];
@@ -199,35 +201,35 @@ int main(int argc, char** argv) {
   struct timeval end;
   gettimeofday(&end, NULL);
 
-  double start_usec = (start.tv_sec * 1000000.0) + start.tv_usec;
-  double end_usec = (end.tv_sec * 1000000.0) + end.tv_usec;
-  double time_sec = (end_usec - start_usec) / 1000000;
-  unsigned long eps = (unsigned long)(epoch / time_sec);
+  f64 start_usec = (start.tv_sec * 1000000.0) + start.tv_usec;
+  f64 end_usec = (end.tv_sec * 1000000.0) + end.tv_usec;
+  f64 time_sec = (end_usec - start_usec) / 1000000;
+  u64 eps = (u64)(epoch / time_sec);
 
-  printf("\n\nEpoch=%'ld Error=%.3lg time=%.3lfs eps=%'ld\n", epoch, error, time_sec, eps);
+  printf("\n\nEpoch=%'" PRId64 " error=%.3lg time=%.3lfs eps=%'" PRId64 "\n", epoch, error, time_sec, eps);
 
   nn.stop(&nn);
 
   printf("\nPat");
-  for (unsigned long i = 0; i < xor_input_patterns[0].count; i++) {
-    printf("\tInput%-4ld", i);
+  for (u64 i = 0; i < xor_input_patterns[0].count; i++) {
+    printf("\tInput%-4" PRId64 "", i);
   }
-  for (unsigned long t = 0; t < xor_target_patterns[0].count; t++) {
-    printf("\tTarget%-4ld", t);
+  for (u64 t = 0; t < xor_target_patterns[0].count; t++) {
+    printf("\tTarget%-4" PRId64 "", t);
   }
-  for (unsigned long o = 0; o < xor_output[0].count; o++) {
-    printf("\tOutput%-4ld", o);
+  for (u64 o = 0; o < xor_output[0].count; o++) {
+    printf("\tOutput%-4" PRId64 "", o);
   }
   printf("\n");
-  for (unsigned long p = 0; p < pattern_count; p++) {
-    printf("%ld", p);
-    for (unsigned long i = 0; i < xor_input_patterns[p].count; i++) {
+  for (u64 p = 0; p < pattern_count; p++) {
+    printf("%" PRId64 "", p);
+    for (u64 i = 0; i < xor_input_patterns[p].count; i++) {
       printf("\t%lf", xor_input_patterns[p].data[i]);
     }
-    for (unsigned long t = 0; t < xor_target_patterns[p].count; t++) {
+    for (u64 t = 0; t < xor_target_patterns[p].count; t++) {
       printf("\t%lf", xor_target_patterns[p].data[t]);
     }
-    for (unsigned long o = 0; o < xor_output[p].count; o++) {
+    for (u64 o = 0; o < xor_output[p].count; o++) {
       printf("\t%lf", xor_output[p].data[o]);
     }
     printf("\n");

@@ -17,6 +17,8 @@
 #ifndef NEURAL_NET_H
 #define NEURAL_NET_H
 
+#include "types.h"
+
 typedef int Status;
 #define STATUS_OK  0 ///< OK
 #define STATUS_ERR 1 ///< Error
@@ -48,52 +50,50 @@ typedef Status (*NeuralNet_Start)(NeuralNet* nn);
 
 typedef void (*NeuralNet_Stop)(NeuralNet* nn);
 
-typedef Status (*NeuralNet_AddHidden)(NeuralNet* nn, unsigned long count);
+typedef Status (*NeuralNet_AddHidden)(NeuralNet* nn, u64 count);
 
-typedef unsigned long (*NeuralNet_GetPoints)(NeuralNet* nn);
+typedef u64 (*NeuralNet_GetPoints)(NeuralNet* nn);
 
 typedef void (*NeuralNet_SetInputs)(NeuralNet* nn, Pattern* input);
 
 typedef void (*NeuralNet_GetOutputs)(NeuralNet* nn, Pattern* output);
 
-typedef double (*NeuralNet_AdjustWeights)(NeuralNet* nn, Pattern* output, Pattern* target);
+typedef f64 (*NeuralNet_AdjustWeights)(NeuralNet* nn, Pattern* output, Pattern* target);
 
 typedef void (*NeuralNet_Process)(NeuralNet* nn);
 
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpadded"
 typedef struct Pattern {
-  unsigned long padding;
-  unsigned long count;
-  double data[];
+  u64 count;
+  f64 data[];
 } Pattern;
 
 typedef struct Neuron {
   NeuronLayer* inputs;  // Neuron layer of inputs
-  double* weights;      // Array of weights for each input plus the bias
-  double* momentums;    // Array of momentums for each input plus the bias
-  unsigned long padding;
-  double output;        // The output of this neuron
-  double pd_error;      // Partial derative of this neurons error
-  unsigned long points; // Points is number of graphic points
-  unsigned long padding2;
+  f64* weights;      // Array of weights for each input plus the bias
+  f64* momentums;    // Array of momentums for each input plus the bias
+  f64 output;        // The output of this neuron
+  f64 pd_error;      // Partial derative of this neurons error
+  u64 points;        // Points is number of graphic points
 } Neuron;
 
 typedef struct NeuronLayer {
-  unsigned long count;  // Number of neurons
-  Neuron* neurons;      // The neurons
+  u64 count;          // Number of neurons
+  Neuron* neurons;    // The neurons
 } NeuronLayer;
 
 typedef struct NeuralNet {
-  unsigned long max_layers; // Maximum layers in the nn
+  u64 max_layers; // Maximum layers in the nn
                             // layers[0] input layer
                             // layers[1] first hidden layer
-  unsigned long out_layer;  // layers[out_layer] is output layer
-  unsigned long last_hidden;// layers[last_hidden] is last hidden layer
-  unsigned long padding;
-  double error;             // The overall network error
-  double learning_rate;     // Learning rate aka 'eta'
-  double momentum_factor;   // Momentum factor aka 'aplha'
-  unsigned long points;     // Points is number
+  u64 out_layer;  // layers[out_layer] is output layer
+  u64 last_hidden;// layers[last_hidden] is last hidden layer
+  f64 error;             // The overall network error
+  f64 learning_rate;     // Learning rate aka 'eta'
+  f64 momentum_factor;   // Momentum factor aka 'aplha'
+  u64 points;     // Points is number
 
   Pattern* input;           // Input pattern
 
@@ -113,8 +113,9 @@ typedef struct NeuralNet {
   NeuralNet_Process process;
 
 } NeuralNet;
+#pragma clang diagnostic pop
 
-Status NeuralNet_init(NeuralNet* nn, unsigned long num_in, unsigned long num_hidden, unsigned long num_out);
+Status NeuralNet_init(NeuralNet* nn, u64 num_in, u64 num_hidden, u64 num_out);
 
 
 #endif

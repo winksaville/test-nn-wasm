@@ -31,6 +31,17 @@ typedef __UINT32_TYPE__ u32;
 typedef __UINT16_TYPE__ u16;
 typedef __UINT8_TYPE__  u8;
 
+#define PRId64 __INT64_FMTd__
+#define PRId32 __INT32_FMTd__
+#define PRId16 __INT16_FMTd__
+#define PRId8  __INT8_FMTd__
+
+#define PRIu64 __UINT64_FMTd__
+#define PRIu32 __UINT32_FMTd__
+#define PRIu16 __UINT16_FMTd__
+#define PRIu8  __UINT8_FMTd__
+
+
 typedef double f64;
 typedef float f32;
 
