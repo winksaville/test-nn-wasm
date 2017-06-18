@@ -93,6 +93,7 @@ $(libDstDir)/%.c.wasm: $(libDstDir)/%.c.wast
 	$(wast2wasm) $< -o $@
 	
 LIBSRCS= \
+	  $(libDir)/trainXorNn.c \
 	  $(libDir)/NeuralNet.c \
 	  $(libDir)/NeuralNetIo.c \
 	  $(libDir)/xoroshiro128plus.c \
@@ -103,6 +104,7 @@ LIBSRCS= \
 	  $(libDir)/memset.c
 
 LIBOBJS= \
+	  $(libDstDir)/trainXorNn.o \
 	  $(libDstDir)/NeuralNet.o \
 	  $(libDstDir)/NeuralNetIo.o \
 	  $(libDstDir)/xoroshiro128plus.o \
@@ -128,23 +130,25 @@ test: $(outDir)/test-nn
 # Currently wasm-link doesn't work with modules that have a memory section
 #build.wasm: \
 # $(srcDstDir)/call_print_i32.c.wasm \
-# $(libDstDir)/e_exp.c.wasm \
-# $(libDstDir)/malloc.c.wasm \
-# $(libDstDir)/calloc.c.wasm \
-# $(libDstDir)/memset.c.wasm \
+# $(libDstDir)/trainXorNn.c.wasm \
+# $(libDstDir)/NeuralNet.c.wasm \
 # $(libDstDir)/xoroshiro128plus.c.wasm \
 # $(libDstDir)/rand0_1.c.wasm \
-# $(libDstDir)/NeuralNet.c
+# $(libDstDir)/e_exp.c.wasm \
+# $(libDstDir)/calloc.c.wasm \
+# $(libDstDir)/malloc.c.wasm \
+# $(libDstDir)/memset.c.wasm
 #	$(wasm-link) $^ -o $(libDstDir)/libwasm.c.wasm
 
 $(libDir)/libwasm.c: \
- $(libDir)/e_exp.c \
- $(libDir)/malloc.c \
- $(libDir)/calloc.c \
- $(libDir)/memset.c \
+ $(libDir)/trainXorNn.c \
+ $(libDir)/NeuralNet.c \
  $(libDir)/xoroshiro128plus.c \
  $(libDir)/rand0_1.c \
- $(libDir)/NeuralNet.c
+ $(libDir)/e_exp.c \
+ $(libDir)/calloc.c \
+ $(libDir)/malloc.c \
+ $(libDir)/memset.c
 	touch $(libDir)/libwasm.c
 
 build.wasm: \

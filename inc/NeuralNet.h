@@ -19,24 +19,6 @@
 
 #include "types.h"
 
-typedef int Status;
-#define STATUS_OK  0 ///< OK
-#define STATUS_ERR 1 ///< Error
-#define STATUS_OOM 2 ///< Out of memory
-#define STATUS_BAD_PARAM 3 ///< Bad parameter
-#define STATUS_BAD_CODE 4  ///< A bug in the code
-
-#define STATUS_TO_MANY_HIDDEN 100 ///< To many calls to NeuralNet_add_hidden
-
-/** Evaluates to true if status is good */
-#define StatusOk(s) ((s) == STATUS_OK)
-
-/** Evaluates to false if status is bad */
-#define StatusErr(s) (!StatusOk(s))
-
-/** Evaluates to the status integer value */
-#define StatusVal(s) (s)
-
 // Forward declarations
 typedef struct Pattern Pattern;
 typedef struct Neuron Neuron;
