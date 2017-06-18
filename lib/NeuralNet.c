@@ -18,13 +18,10 @@
 #include "dbg.h"
 #include "rand0_1.h"
 #include "e_exp.h"
+#include "malloc.h"
 #include "calloc.h"
 #include "unused.h"
-
-#include <math.h>
-#include <stdlib.h>
-#include <stdio.h>
-
+#include "types.h"
 
 // Forward declarations
 static void NeuralNet_deinit(NeuralNet* nn);

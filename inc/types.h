@@ -51,4 +51,18 @@ typedef __PTRDIFF_TYPE__ ptrdiff_t;
  */
 #define ALIGNTO_TYPE(addr, type) (typeof(type)*)ROUNDUP(addr, sizeof(type))
 
+/**
+ * NAN returns a double
+ */
+#ifndef NAN
+#define NAN __builtin_nan("")
+#endif
+
+/**
+ * NANf returns a float
+ */
+#ifndef NANF
+#define NANF __builtin_nanf("")
+#endif
+
 #endif

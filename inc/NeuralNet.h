@@ -62,6 +62,7 @@ typedef void (*NeuralNet_Process)(NeuralNet* nn);
 
 
 typedef struct Pattern {
+  unsigned long padding;
   unsigned long count;
   double data[];
 } Pattern;
@@ -70,9 +71,11 @@ typedef struct Neuron {
   NeuronLayer* inputs;  // Neuron layer of inputs
   double* weights;      // Array of weights for each input plus the bias
   double* momentums;    // Array of momentums for each input plus the bias
+  unsigned long padding;
   double output;        // The output of this neuron
   double pd_error;      // Partial derative of this neurons error
   unsigned long points; // Points is number of graphic points
+  unsigned long padding2;
 } Neuron;
 
 typedef struct NeuronLayer {
@@ -86,6 +89,7 @@ typedef struct NeuralNet {
                             // layers[1] first hidden layer
   unsigned long out_layer;  // layers[out_layer] is output layer
   unsigned long last_hidden;// layers[last_hidden] is last hidden layer
+  unsigned long padding;
   double error;             // The overall network error
   double learning_rate;     // Learning rate aka 'eta'
   double momentum_factor;   // Momentum factor aka 'aplha'

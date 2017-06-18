@@ -133,7 +133,8 @@ test: $(outDir)/test-nn
 # $(libDstDir)/calloc.c.wasm \
 # $(libDstDir)/memset.c.wasm \
 # $(libDstDir)/xoroshiro128plus.c.wasm \
-# $(libDstDir)/rand0_1.c.wasm
+# $(libDstDir)/rand0_1.c.wasm \
+# $(libDstDir)/NeuralNet.c
 #	$(wasm-link) $^ -o $(libDstDir)/libwasm.c.wasm
 
 $(libDir)/libwasm.c: \
@@ -142,7 +143,8 @@ $(libDir)/libwasm.c: \
  $(libDir)/calloc.c \
  $(libDir)/memset.c \
  $(libDir)/xoroshiro128plus.c \
- $(libDir)/rand0_1.c
+ $(libDir)/rand0_1.c \
+ $(libDir)/NeuralNet.c
 	touch $(libDir)/libwasm.c
 
 build.wasm: \

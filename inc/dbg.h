@@ -17,11 +17,14 @@
 #ifndef DBG_H
 #define DBG_H
 
-#if DBG == 0
-  #define dbg(...) ((void*)0)
-#else
-  #define dbg(...) printf(__VA_ARGS__)
-#endif
+extern int printf (const char *__restrict __format, ...);
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wvariadic-macros"
+#define dbg(fmt ...) \
+  do { \
+      if (DBG) printf(fmt); \
+  } while (0)
+#pragma clang diagnostic pop
 
 #endif
-
