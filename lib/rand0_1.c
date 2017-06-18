@@ -18,8 +18,8 @@
 #include "./xoroshiro128plus.h"
 #include "sizedtypes.h"
 
-void srand0_1(u32 v1, u32 v2, u32 v3, u32 v4) {
-    xoroshiro128plus_srand(((u64)v1 << 32) | v2, ((u64)v3 << 32) | v4);
+void srand0_1(u32 sr1, u32 sr2, u32 sr3, u32 sr4) {
+    xoroshiro128plus_srand(((u64)sr1 << 32) | sr2, ((u64)sr3 << 32) | sr4);
 }
 
 double rand0_1(void) {

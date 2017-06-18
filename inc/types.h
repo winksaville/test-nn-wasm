@@ -39,7 +39,7 @@ typedef __PTRDIFF_TYPE__ ptrdiff_t;
 #define UNUSED(s) (void)s
 #endif
 
-typedef int Status;
+typedef u32 Status;
 #define STATUS_OK  0 ///< OK
 #define STATUS_ERR 1 ///< Error
 #define STATUS_OOM 2 ///< Out of memory

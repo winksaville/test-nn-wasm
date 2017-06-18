@@ -22,42 +22,29 @@
 #include "NeuralNet.h"
 #include "dbg.h"
 #include "rand0_1.h"
-#include "calloc.h"
+#include "memory.h"
 #include "types.h"
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpadded"
-#define INPUT_COUNT 2
-typedef struct InputPattern {
-  u64 count;
-  f64 data[INPUT_COUNT];
-} InputPattern;
-
-#define OUTPUT_COUNT 1
-typedef struct OutputPattern {
-  u64 count;
-  f64 data[OUTPUT_COUNT];
-} OutputPattern;
-#pragma clang diagnostic pop
-
-
-static InputPattern xor_input_patterns[] = {
+InputPattern xor_input_patterns[INPUT_PATTERNS_COUNT] = {
   { .count = INPUT_COUNT, .data[0] = 0, .data[1] = 0 },
   { .count = INPUT_COUNT, .data[0] = 1, .data[1] = 0 },
   { .count = INPUT_COUNT, .data[0] = 0, .data[1] = 1 },
   { .count = INPUT_COUNT, .data[0] = 1, .data[1] = 1 },
 };
 
-static OutputPattern xor_target_patterns[] = {
+OutputPattern xor_target_patterns[INPUT_PATTERNS_COUNT] = {
   { .count = OUTPUT_COUNT, .data[0] = 0 },
   { .count = OUTPUT_COUNT, .data[0] = 1 },
   { .count = OUTPUT_COUNT, .data[0] = 1 },
   { .count = OUTPUT_COUNT, .data[0] = 0 },
 };
 
-static NeuralNet xorNn;
+NeuralNet xorNn;
 
-static OutputPattern xor_output[sizeof(xor_target_patterns)/sizeof(OutputPattern)];
+OutputPattern xor_output[INPUT_PATTERNS_COUNT];
+
+static f64 g_error = 0;
+static f64 g_epochs = 0;
 
 /**
  * Train a Neural Network to solve an xor function where
@@ -66,29 +53,33 @@ static OutputPattern xor_output[sizeof(xor_target_patterns)/sizeof(OutputPattern
  * TODO: Evenutally this should accept a NeuralNetwork and a
  * set of training patterns as parameters.
  *
- * @param epoch_count is maximum number of traning loops
+ * @param epoch_count_f is maximum number of traning loops
  * @param error_threshold is the minimum error to determine when training
  *        is complete. A value of 0.0 will cause all training loops to be
  *        run. A value of 0.0004 is a decent number threshold and will take
  *        about 1500 to 1600 loops.
- * @param rand_seed is the seed for the random number generator.
- *
- * @returns error_threshold >= 0 and its the negative of STATUS_xxx code if < 0.
+ * @param sr1 first u32 for random seed
+ * @param sr2 second u32 for random seed
+ * @param sr3 third u32 for random seed
+ * @param sr4 fourth u32 for random seed
+ * @returns status 0 == no error
  */
-f64 trainXorNn(u64 epoch_count, f64 error_threshold, u64 rand_seed) {
+u32 trainXorNn(f64 epoch_count_f, f64 error_threshold,
+        u32 sr1, u32 sr2, u32 sr3, u32 sr4) {
   Status status = 0;
+  u64 epoch_count;
   u64 epoch = 0;
   f64 error = 0.0;
+  unsigned int* rand_ps = NULL;
 
-  dbg("trainXorNn:+ epoch_count=%" PRIu64 " error_threshold=%lf rand_seed=%" PRIu64 "\n",
-          epoch_count, error_threshold, rand_seed);
+  // Only 53 bits percision in an f64
+  epoch_count = (epoch_count_f >= (f64)((u64)1 << 53)) ? U64_MAX : (u64)epoch_count_f;
 
-  srand0_1(
-      (rand_seed >> (64-16)) & 0xffff,
-      (rand_seed >> (64-32)) & 0xffff,
-      (rand_seed >> (64-48)) & 0xffff,
-      (rand_seed >> (64-64)) & 0xffff
-  );
+  dbg("trainXorNn:+ epoch_count=%" PRIu64 " error_threshold=%lf"
+          "sr1=%" PRIu32 "sr2=%" PRIu32 "sr3=%" PRIu32 "sr4=%" PRIu32,
+          epoch_count, error_threshold, sr1, sr2, sr3, sr4);
+
+  srand0_1(sr1, sr2, sr3, sr4);
 
   u64 num_inputs = 2;
   u64 num_hidden = 1;
@@ -105,7 +96,7 @@ f64 trainXorNn(u64 epoch_count, f64 error_threshold, u64 rand_seed) {
   if (StatusErr(status)) goto done;
 
   unsigned int pattern_count = sizeof(xor_input_patterns)/sizeof(InputPattern);
-  unsigned int* rand_ps = calloc(pattern_count, sizeof(unsigned int));
+  rand_ps = calloc(pattern_count, sizeof(unsigned int));
 
   for (epoch = 0; epoch < epoch_count; epoch++) {
     error = 0.0;
@@ -146,14 +137,23 @@ f64 trainXorNn(u64 epoch_count, f64 error_threshold, u64 rand_seed) {
     }
   }
 
+  g_error = error;
+  g_epochs = epoch;
+
   status = 0;
 
 done:
   xorNn.deinit(&xorNn);
+  free(rand_ps);
 
-  if (status > 0) {
-      error_threshold = -status;
-  }
-  dbg("trainXorNn:- error_threshold=%lf\n", error_threshold);
-  return error_threshold;
+  dbg("trainXorNn:- status=%" PRIu32 " error_threshold=%lf\n", status, error_threshold);
+  return status;
+}
+
+f64 getError(void) {
+    return g_error;
+}
+
+f64 getEpochs(void) {
+    return g_epochs;
 }

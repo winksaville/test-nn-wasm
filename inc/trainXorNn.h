@@ -18,7 +18,35 @@
 #define TRAINXORNN_H
 
 #include "types.h"
+#include "NeuralNet.h"
 
-f64 trainXorNn(u64 epoch_count, f64 error_threshold, u64 rand_seed);
+#define INPUT_PATTERNS_COUNT 4
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpadded"
+#define INPUT_COUNT 2
+typedef struct InputPattern {
+  u64 count;
+  f64 data[INPUT_COUNT];
+} InputPattern;
+
+#define OUTPUT_COUNT 1
+typedef struct OutputPattern {
+  u64 count;
+  f64 data[OUTPUT_COUNT];
+} OutputPattern;
+#pragma clang diagnostic pop
+
+extern InputPattern xor_input_patterns[];
+extern OutputPattern xor_target_patterns[];
+extern OutputPattern xor_output[];
+
+extern NeuralNet xorNn;
+
+u32 trainXorNn(f64 epoch_count, f64 error_threshold,
+        u32 sr1, u32 sr2, u32 sr3, u32 sr4);
+
+f64 getError(void);
+f64 getEpochs(void);
 
 #endif

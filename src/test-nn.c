@@ -21,6 +21,7 @@
 #include "NeuralNetIo.h"
 #include "dbg.h"
 #include "rand0_1.h"
+#include "trainXorNn.h"
 
 #include <errno.h>
 #include <limits.h>
@@ -31,40 +32,6 @@
 #include <time.h>
 #include <sys/time.h>
 #include <locale.h>
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpadded"
-#define INPUT_COUNT 2
-typedef struct InputPattern {
-  u64 count;
-  f64 data[INPUT_COUNT];
-} InputPattern;
-
-#define OUTPUT_COUNT 1
-typedef struct OutputPattern {
-  u64 count;
-  f64 data[OUTPUT_COUNT];
-} OutputPattern;
-#pragma clang diagnostic pop
-
-
-static InputPattern xor_input_patterns[] = {
-  { .count = INPUT_COUNT, .data[0] = 0, .data[1] = 0 },
-  { .count = INPUT_COUNT, .data[0] = 1, .data[1] = 0 },
-  { .count = INPUT_COUNT, .data[0] = 0, .data[1] = 1 },
-  { .count = INPUT_COUNT, .data[0] = 1, .data[1] = 1 },
-};
-
-static OutputPattern xor_target_patterns[] = {
-  { .count = OUTPUT_COUNT, .data[0] = 0 },
-  { .count = OUTPUT_COUNT, .data[0] = 1 },
-  { .count = OUTPUT_COUNT, .data[0] = 1 },
-  { .count = OUTPUT_COUNT, .data[0] = 0 },
-};
-
-static NeuralNet nn;
-
-static OutputPattern xor_output[sizeof(xor_target_patterns)/sizeof(OutputPattern)];
 
 int main(int argc, char** argv) {
   Status status;
@@ -130,23 +97,22 @@ int main(int argc, char** argv) {
   u64 num_inputs = 2;
   u64 num_hidden = 1;
   u64 num_outputs = 1;
-  status = NeuralNet_init(&nn, num_inputs, num_hidden, num_outputs);
+  status = NeuralNet_init(&xorNn, num_inputs, num_hidden, num_outputs);
   if (StatusErr(status)) goto done;
 
   // Each hidden layer is fully connected plus a bias
   u64 hidden_neurons = 2;
-  status = nn.add_hidden(&nn, hidden_neurons);
+  status = xorNn.add_hidden(&xorNn, hidden_neurons);
   if (StatusErr(status)) goto done;
 
-  status = nn.start(&nn);
+  status = xorNn.start(&xorNn);
   if (StatusErr(status)) goto done;
 
-  unsigned int pattern_count = sizeof(xor_input_patterns)/sizeof(InputPattern);
-  unsigned int* rand_ps = calloc(pattern_count, sizeof(unsigned int));
+  unsigned int pattern_count = INPUT_PATTERNS_COUNT;
 
   if (strlen(out_path) > 0) {
     writer = calloc(1, sizeof(NeuralNetIoWriter));
-    status = NeuralNetIoWriter_init(writer, &nn, nn.get_points(&nn), out_path);
+    status = NeuralNetIoWriter_init(writer, &xorNn, xorNn.get_points(&xorNn), out_path);
     if (StatusErr(status)) goto done;
   } else {
     writer = NULL;
@@ -154,50 +120,11 @@ int main(int argc, char** argv) {
 
   struct timeval start;
   gettimeofday(&start, NULL);
-  for (epoch = 0; epoch < epoch_count; epoch++) {
-    error = 0.0;
-
-    // Shuffle rand_patterns by swapping the current
-    // position t with a random location after the
-    // current position.
-
-    // Start by resetting to sequential order
-    for (unsigned int p = 0; p < pattern_count; p++) {
-      rand_ps[p] = p;
-    }
-
-    // Shuffle
-    for (unsigned int p = 0; p < pattern_count; p++) {
-      f64 r0_1 = rand0_1();
-      unsigned int rp = p + (unsigned int)(r0_1 * (pattern_count - p));
-      unsigned t = rand_ps[p];
-      rand_ps[p] = rand_ps[rp];
-      rand_ps[rp] = t;
-      //dbg("r0_1=%lf rp=%d rand_ps[%d]=%d\n", r0_1, rp, p, rand_ps[p]);
-    }
-
-    // Process the pattern and accumulate the error
-    for (unsigned int rp = 0; rp < pattern_count; rp++) {
-      unsigned int p = rand_ps[rp];
-      nn.set_inputs(&nn, (Pattern*)&xor_input_patterns[p]);
-      nn.process(&nn);
-      xor_output[p].count = OUTPUT_COUNT;
-      nn.get_outputs(&nn, (Pattern*)&xor_output[p]);
-      error += nn.adjust_weights(&nn, (Pattern*)&xor_output[p],
-          (Pattern*)&xor_target_patterns[p]);
-
-      if (writer != NULL) {
-        writer->begin_epoch(writer, (epoch * pattern_count) + rp);
-        writer->write_epoch(writer);
-        writer->end_epoch(writer);
-      }
-    }
-
-    // Stop if we've reached the error_threshold
-    if (error < error_threshold) {
-      break;
-    }
-  }
+  status = trainXorNn(epoch_count, error_threshold, 1, 2, 3, 4);
+  if (StatusErr(status)) goto done;
+  f64 epochs = getEpochs();
+  epoch = (u64)epochs;
+  error = getError();
   struct timeval end;
   gettimeofday(&end, NULL);
 
@@ -206,9 +133,10 @@ int main(int argc, char** argv) {
   f64 time_sec = (end_usec - start_usec) / 1000000;
   u64 eps = (u64)(epoch / time_sec);
 
-  printf("\n\nEpoch=%'" PRIu64 " error=%.3lg time=%.3lfs eps=%'" PRIu64 "\n", epoch, error, time_sec, eps);
+  printf("\n\nEpoch=%'" PRIu64 " error=%.3lg time=%.3lfs eps=%'" PRIu64 "\n",
+          epoch, error, time_sec, eps);
 
-  nn.stop(&nn);
+  xorNn.stop(&xorNn);
 
   printf("\nPat");
   for (u64 i = 0; i < xor_input_patterns[0].count; i++) {
@@ -241,7 +169,7 @@ done:
   if (writer != NULL) {
     writer->deinit(writer, epoch);
   }
-  nn.deinit(&nn);
+  xorNn.deinit(&xorNn);
 
 donedone:
   dbg("test-nn:- status=%d\n", status);
