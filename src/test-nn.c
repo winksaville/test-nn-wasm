@@ -113,7 +113,7 @@ int main(int argc, char** argv) {
     out_path = argv[2];
   }
 
-  dbg("test-nn: epoch_count=%" PRId64 " out_pat='%s'\n", epoch_count, out_path);
+  dbg("test-nn: epoch_count=%" PRIu64 " out_pat='%s'\n", epoch_count, out_path);
 
   // seed the random number generator
 #if 0
@@ -206,23 +206,23 @@ int main(int argc, char** argv) {
   f64 time_sec = (end_usec - start_usec) / 1000000;
   u64 eps = (u64)(epoch / time_sec);
 
-  printf("\n\nEpoch=%'" PRId64 " error=%.3lg time=%.3lfs eps=%'" PRId64 "\n", epoch, error, time_sec, eps);
+  printf("\n\nEpoch=%'" PRIu64 " error=%.3lg time=%.3lfs eps=%'" PRIu64 "\n", epoch, error, time_sec, eps);
 
   nn.stop(&nn);
 
   printf("\nPat");
   for (u64 i = 0; i < xor_input_patterns[0].count; i++) {
-    printf("\tInput%-4" PRId64 "", i);
+    printf("\tInput%-4" PRIu64 "", i);
   }
   for (u64 t = 0; t < xor_target_patterns[0].count; t++) {
-    printf("\tTarget%-4" PRId64 "", t);
+    printf("\tTarget%-4" PRIu64 "", t);
   }
   for (u64 o = 0; o < xor_output[0].count; o++) {
-    printf("\tOutput%-4" PRId64 "", o);
+    printf("\tOutput%-4" PRIu64 "", o);
   }
   printf("\n");
   for (u64 p = 0; p < pattern_count; p++) {
-    printf("%" PRId64 "", p);
+    printf("%" PRIu64 "", p);
     for (u64 i = 0; i < xor_input_patterns[p].count; i++) {
       printf("\t%lf", xor_input_patterns[p].data[i]);
     }
