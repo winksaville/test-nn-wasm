@@ -14,10 +14,11 @@
         "postcleanup": "mkdir -p build out .d",
         "cleanup": "rm -rf out/ build/ .d/",
         "distcleanup": "rm -rf node_modules/ && yarn cleanup",
-        "build.tsc": "tsc -p lib/utils.tsconfig.json && tsc -p lib/tsconfig.json && tsc -p src/print_i32.tsconfig.json",
+        "build.tsc": "tsc -p lib/utils.tsconfig.json && tsc -p lib/tsconfig.json && tsc -p src/print_i32.tsconfig.json && tsc -p src/test-nn.tsconfig.json",
         "build.wasm": "make build.wasm",
         "pretest": "yarn build.wasm && yarn build.tsc",
-        "test": "node build/print_i32.js && node build/rand0_1.js && node build/e_exp.js && node build/malloc.js"
+        "test": "node build/print_i32.js && node build/rand0_1.js && node build/e_exp.js && node build/malloc.js && node build/test-nn.js",
+        "test-nn": "node build/test-nn.js"
     },
     "devDependencies": {
         "typescript": "^2.3.4"
