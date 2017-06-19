@@ -124,7 +124,7 @@ $(outDir)/test-nn : $(LIBOBJS) $(outDir)/test-nn.o
 	$(LNK) $(LIBOBJS) $(outDir)/test-nn.o $(LNKFLAGS) -o $@
 	$(OD) $(ODFLAGS) $@ > $@.asm
 
-test: $(outDir)/test-nn
+test-nn: $(outDir)/test-nn
 	$(outDir)/test-nn $(P1)
 
 # Currently wasm-link doesn't work with modules that have a memory section

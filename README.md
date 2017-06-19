@@ -24,38 +24,37 @@ $ yarn postcleanup
 yarn postcleanup v0.24.6
 ```
 
-# Run simple wasm test
+# Performance
+As of 2018-06-18 the native code is about 1.28x faster than wasm:
 ```
-$ yarn test
-yarn test v0.24.6
-$ make build.wasm && yarn build.tsc
-/home/wink/prgs/llvmwasm-builder/dist/bin/clang -emit-llvm --target=wasm32 -Weverything -Oz src/call_print_i32.c -c -o out/src/call_print_i32.c.bc
-/home/wink/prgs/llvmwasm-builder/dist/bin/llc -asm-verbose=false out/src/call_print_i32.c.bc -o out/src/call_print_i32.c.s
-/home/wink/prgs/llvmwasm-builder/dist/bin/s2wasm --import-memory out/src/call_print_i32.c.s -o out/src/call_print_i32.c.wast
-/home/wink/prgs/llvmwasm-builder/dist/bin/wast2wasm out/src/call_print_i32.c.wast -o out/src/call_print_i32.c.wasm
-rm out/src/call_print_i32.c.s out/src/call_print_i32.c.bc
-yarn build:tsc v0.24.6
-$ tsc -p src/utils.tsconfig.json && tsc -p src/print_i32.tsconfig.json 
-Done in 2.73s.
-$ node --expose_wasm build/print_i32.js 
-x=null
-invoke call_print_i32
-print_i32: arg=48
-invoked call_print_i32
-Done in 3.14s.
+1,430,000 / 1,120,000 = 1.28x
 ```
 
-# Run native tsc-nn
+# Run native test-nn
 ```
-$ make test
+$ make test-nn
 out/test-nn 10000000
 
 
-Epoch=10,000,000 Error=4.58e-08 time=5.537s eps=1,805,983
+Epoch=10,000,000 error=4.58e-08 time=7.010s eps=1,426,570
 
 Pat	Input0   	Input1   	Target0   	Output0   
 0	0.000000	0.000000	0.000000	0.000142
 1	1.000000	0.000000	1.000000	0.999857
 2	0.000000	1.000000	1.000000	0.999857
 3	1.000000	1.000000	0.000000	0.000175
+```
+
+# Run wasm test-nn
+```
+$ yarn test-nn
+yarn test-nn v0.24.6
+$ yarn build.wasm
+yarn build.wasm v0.24.6
+$ make build.wasm 
+make: Nothing to be done for 'build.wasm'.
+Done in 0.10s.
+$ node build/test-nn.js 
+Epoch=10,000,000 error=4.58e-8 status=0 time=8.92s eps=1,120,637
+Done in 9.35s.
 ```

@@ -18,6 +18,7 @@
         "build.wasm": "make build.wasm",
         "pretest": "yarn build.wasm && yarn build.tsc",
         "test": "node build/print_i32.js && node build/rand0_1.js && node build/e_exp.js && node build/malloc.js && node build/test-nn.js",
+        "pretest-nn": "yarn build.wasm",
         "test-nn": "node build/test-nn.js"
     },
     "devDependencies": {
