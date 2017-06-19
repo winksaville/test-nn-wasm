@@ -45,11 +45,37 @@ async function load_wasm_imports(): Promise<Error | null> {
     }
 }
 
-async function main() {
+async function main(argv: string[]) {
     try {
         await load_wasm_imports();
         let epoch_count = 10000000;
         let error_threshold = 0.0;
+
+        if (argv.length < 3) {
+            console.log("Usage: %s <param1>\n", argv[0]);
+            console.log("  param1: if param1 >= 1 then number of epochs");
+            console.log("          else if param1 >= 0.0 && param1 < 1.0 then error threshold typical = 0.0004");
+            console.log("          else param1 invalid");
+            process.exit(0);
+        }
+
+        error_threshold = parseFloat(argv[2]);
+        if (error_threshold < 0.0) {
+            console.log(`param1:${numeral(error_threshold).format("0.00")} < 0.0, aborting`);
+            process.exit(1);
+        } else if ((error_threshold > 0.0) && (error_threshold < 1.0)) {
+            epoch_count = Number.MAX_SAFE_INTEGER;
+        } else {
+            let count = Math.floor(error_threshold);
+            if (count > Number.MAX_SAFE_INTEGER) {
+                console.log(`param1:${numeral(count).format("0.00")} > `
+                            + `${numeral(Number.MAX_SAFE_INTEGER).format("0,0")}, aborting`);
+                process.exit(1);
+            }
+            epoch_count = count;
+            error_threshold = 0.0;
+        }
+
         let sr1 = 1;
         let sr2 = 2;
         let sr3 = 3;
@@ -75,4 +101,4 @@ async function main() {
     }
 }
 
-main();
+main(process.argv);
