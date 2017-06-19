@@ -24,7 +24,11 @@
         "typescript": "^2.3.4"
     },
     "dependencies": {
+        "@types/microtime": "^2.1.0",
         "@types/node": "^7.0.29",
-        "@types/webassembly-js-api.d.ts": "https://github.com/winksaville/webassembly-js-api.d.ts.git"
+        "@types/numeral": "^0.0.21",
+        "@types/webassembly-js-api.d.ts": "https://github.com/winksaville/webassembly-js-api.d.ts.git",
+        "microtime": "^2.1.5",
+        "numeral": "^2.0.6"
     }
 }

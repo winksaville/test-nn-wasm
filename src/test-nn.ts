@@ -1,4 +1,21 @@
+/*
+ * Copyright 2017 Wink Saville
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 import {instantiateWasmFile} from "../build/utils";
+import * as  microtime from "microtime";
+import * as  numeral from "numeral";
 
 /**
  * The import object passed to instantiateWasmFile
@@ -37,9 +54,22 @@ async function main() {
         let sr2 = 2;
         let sr3 = 3;
         let sr4 = 4;
-        console.log(`trainXorNn(${epoch_count}, ${error_threshold}, ${sr1}, ${sr2}, ${sr3}, ${sr4})=`
-        + `${trainXorNn(epoch_count, error_threshold, sr1, sr2, sr3, sr4)}`);
-        console.log(`  error=${getError()} epochs=${getEpochs()}`);
+
+        let start_sec: number = microtime.nowDouble();
+        let status = trainXorNn(epoch_count, error_threshold, sr1, sr2, sr3, sr4);
+        let end_sec: number = microtime.nowDouble();
+
+        let epoch = getEpochs();
+        let error = getError();
+        let time_sec = end_sec - start_sec
+        let eps = epoch / time_sec;
+
+        console.log(`Epoch=${numeral(epoch).format("0,0")}`
+            + ` error=${numeral(error).format("0.00e+0")}`
+            + ` status=${numeral(status).format("0,0")}`
+            + ` time=${numeral(time_sec).format("0.00")}s`
+            + ` eps=${numeral(eps).format("0,0")}`
+        );
     } catch(err) {
         console.log(`err=${err}`);
     }
