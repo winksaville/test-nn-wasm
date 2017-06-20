@@ -5,7 +5,7 @@
     "main": "",
     "repository": "",
     "author": "Wink Saville <wink@saville.com>",
-    "license": "MIT",
+    "license": "Apache-2.0",
     "engines": {
         "node": "^8.0.0"
     },
@@ -20,7 +20,7 @@
         "build.wasm": "make build.wasm build.i.wasm",
         "pretest": "yarn build.wasm && yarn build.tsc",
         "test": "yarn nodev9 build/print_i32.js && yarn nodev9 build/rand0_1.js && yarn nodev9 build/e_exp.js && yarn nodev9 build/malloc.js && yarn nodev9 build/test-nn.js && yarn nodev9 build/xoroshiro128plus.js",
-        "premem": "make build.i.wasm && tsc -p lib/mem.tsconfig.json",
+        "premem": "make build.i.wasm && tsc -p lib/utils.tsconfig.json && tsc -p lib/mem.tsconfig.json",
         "mem": "yarn nodev9 build/mem.js",
         "pretest-nn": "yarn pretest",
         "test-nn": "yarn nodev9 build/test-nn.js",
