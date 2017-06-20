@@ -6,3 +6,4 @@
 #include "calloc.c"
 #include "malloc.c"
 #include "memset.c"
+#include "mem.c"
