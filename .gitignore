@@ -1,6 +1,7 @@
 out/
 build/
 node_modules/
+nodev9/
 .d/
 test-nn
 *.asm

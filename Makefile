@@ -29,9 +29,6 @@ $(shell mkdir -p $(depDir) >/dev/null)
 $(shell mkdir -p $(libDstDir) >/dev/null)
 
 cc.wasm=$(HOME)/prgs/llvmwasm-builder/dist/bin/clang
-llc.wasm=$(HOME)/prgs/llvmwasm-builder/dist/bin/llc
-s2wasm=$(HOME)/prgs/llvmwasm-builder/dist/bin/s2wasm
-wast2wasm=$(HOME)/prgs/llvmwasm-builder/dist/bin/wast2wasm
 wasm2wast=$(HOME)/prgs/llvmwasm-builder/dist/bin/wasm2wast
 wasm-link=$(HOME)/prgs/llvmwasm-builder/dist/bin/wasm-link
 
@@ -61,37 +58,21 @@ $(depDir)/%.d: ;
 .PRECIOUS: $(depDir)/%.d
 
 # wasm suffix rules for srcDir
-$(srcDstDir)/%.c.bc: $(srcDir)/%.c
+$(srcDstDir)/%.c.wasm: $(srcDir)/%.c
 	@mkdir -p $(@D)
-	$(cc.wasm) -emit-llvm --target=wasm32 $(CFLAGS) $< -c -o $@
+	$(cc.wasm) --target=wasm32-unknown-unknown-wasm $(CFLAGS) $< -c -o $@
 
-$(srcDstDir)/%.c.s: $(srcDstDir)/%.c.bc
-	$(llc.wasm) -asm-verbose=false $< -o $@
-
-#S2WASMFLAGS=--import-memory
-S2WASMFLAGS=
-.PRECIOUS: $(srcDstDir)/%.c.wast
-$(srcDstDir)/%.c.wast: $(srcDstDir)/%.c.s
-	$(s2wasm) $(S2WASMFLAGS) $< -o $@
-
-$(srcDstDir)/%.c.wasm: $(srcDstDir)/%.c.wast
-	$(wast2wasm) $< -o $@
+$(srcDstDir)/%.c.wast: $(srcDstDir)/%.c.wasm
+	$(wasm2wast) $< -o $@
 
 # wasm suffix rules for libDir
-$(libDstDir)/%.c.bc: $(libDir)/%.c
+$(libDstDir)/%.c.wasm: $(libDir)/%.c
 	@mkdir -p $(@D)
-	$(cc.wasm) -emit-llvm --target=wasm32 $(CFLAGS) $< -c -o $@
+	$(cc.wasm) --target=wasm32-unknown-unknown-wasm $(CFLAGS) $< -c -o $@
 
-$(libDstDir)/%.c.s: $(libDstDir)/%.c.bc
-	$(llc.wasm) -asm-verbose=false $< -o $@
+$(libDstDir)/%.c.wast: $(libDstDir)/%.c.wasm
+	$(wasm2wast) $< -o $@
 
-.PRECIOUS: $(libDstDir)/%.c.wast
-$(libDstDir)/%.c.wast: $(libDstDir)/%.c.s
-	$(s2wasm) $(S2WASMFLAGS) $< -o $@
-
-$(libDstDir)/%.c.wasm: $(libDstDir)/%.c.wast
-	$(wast2wasm) $< -o $@
-	
 LIBSRCS= \
 	  $(libDir)/trainXorNn.c \
 	  $(libDir)/NeuralNet.c \
@@ -154,7 +135,9 @@ $(libDir)/libwasm.c: \
 build.wasm: \
  $(libDir)/libwasm.c \
  $(libDstDir)/libwasm.c.wasm \
- $(srcDstDir)/call_print_i32.c.wasm
+ $(libDstDir)/libwasm.c.wast \
+ $(srcDstDir)/call_print_i32.c.wasm \
+ $(srcDstDir)/call_print_i32.c.wast
 
 clean :
 	@rm -rf $(outDir) $(depDir)

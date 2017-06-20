@@ -10,16 +10,19 @@
         "node": "^8.0.0"
     },
     "scripts": {
-        "postinstall": "yarn postcleanup",
+        "add.nodev9": "rm -rf nodev9 && mkdir nodev9 && curl https://nodejs.org/download/v8-canary/v9.0.0-v8-canary201706199cf43ea3fd/node-v9.0.0-v8-canary201706199cf43ea3fd-linux-x64.tar.xz -s -o node-v9.tar.xz && tar -xJf node-v9.tar.xz -C nodev9 --strip-components 1 && rm node-v9.tar.xz",
+        "nodev9": "./nodev9/bin/node",
+        "postinstall": "yarn add.nodev9 && yarn postcleanup",
         "postcleanup": "mkdir -p build out .d",
         "cleanup": "rm -rf out/ build/ .d/",
-        "distcleanup": "rm -rf node_modules/ && yarn cleanup",
+        "distcleanup": "rm -rf node_modules/ nodev9/ && yarn cleanup",
         "build.tsc": "tsc -p lib/utils.tsconfig.json && tsc -p lib/tsconfig.json && tsc -p src/print_i32.tsconfig.json && tsc -p src/test-nn.tsconfig.json",
         "build.wasm": "make build.wasm",
         "pretest": "yarn build.wasm && yarn build.tsc",
-        "test": "node build/print_i32.js && node build/rand0_1.js && node build/e_exp.js && node build/malloc.js && node build/test-nn.js",
+        "test": "yarn nodev9 build/print_i32.js && yarn nodev9 build/rand0_1.js && yarn nodev9 build/e_exp.js && yarn nodev9 build/malloc.js && yarn nodev9 build/test-nn.js",
         "pretest-nn": "yarn pretest",
-        "test-nn": "node build/test-nn.js"
+        "test-nn": "yarn nodev9 build/test-nn.js",
+        "doit": "yarn nodev9 build/test-nn.js"
     },
     "devDependencies": {
         "typescript": "^2.3.4"

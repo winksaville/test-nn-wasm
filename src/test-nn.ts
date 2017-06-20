@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import {instantiateWasmFile} from "../build/utils";
-import * as  microtime from "microtime";
 import * as  numeral from "numeral";
 
 /**
@@ -81,9 +80,9 @@ async function main(argv: string[]) {
         let sr3 = 3;
         let sr4 = 4;
 
-        let start_sec: number = microtime.nowDouble();
+        let start_sec: number = Date.now() / 1000.0;
         let status = trainXorNn(epoch_count, error_threshold, sr1, sr2, sr3, sr4);
-        let end_sec: number = microtime.nowDouble();
+        let end_sec: number = Date.now() / 1000.0;
 
         let epoch = getEpochs();
         let error = getError();
